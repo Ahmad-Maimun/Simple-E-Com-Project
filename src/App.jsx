@@ -1,11 +1,12 @@
+import { Route, Routes } from "react-router";
+import DashboardLayout from "./layout/DashboardLayout";
+
 function App() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-    </div>
-  )
+    <Routes>
+      <Route path="/" element={<DashboardLayout />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
