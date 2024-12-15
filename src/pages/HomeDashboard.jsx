@@ -1,30 +1,42 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../features/products/productSlice";
+
 function HomeDashboard() {
+  const data = useSelector((state) => state.products);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getProducts());
+  }, []);
+
   const categories = [
     {
       id: 1,
       name: "Technology",
-      image: "https://via.placeholder.com/150?text=Technology",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 2,
       name: "Health",
-      image: "https://via.placeholder.com/150?text=Health",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 3,
       name: "Travel",
-      image: "https://via.placeholder.com/150?text=Travel",
+      image: "https://via.placeholder.com/150",
     },
-    { id: 4, name: "Food", image: "https://via.placeholder.com/150?text=Food" },
+    { id: 4, name: "Food", image: "https://via.placeholder.com/150" },
     {
       id: 5,
       name: "Education",
-      image: "https://via.placeholder.com/150?text=Education",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 6,
       name: "Sports",
-      image: "https://via.placeholder.com/150?text=Sports",
+      image: "https://via.placeholder.com/150",
     },
   ];
   const products = [
@@ -33,42 +45,42 @@ function HomeDashboard() {
       name: "Wireless Headphones",
       price: "$120",
       rating: 4.5,
-      image: "https://via.placeholder.com/150?text=Headphones",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 2,
       name: "Smart Watch",
       price: "$250",
       rating: 4.0,
-      image: "https://via.placeholder.com/150?text=Smart+Watch",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 3,
       name: "Gaming Mouse",
       price: "$60",
       rating: 4.8,
-      image: "https://via.placeholder.com/150?text=Mouse",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 4,
       name: "Bluetooth Speaker",
       price: "$150",
       rating: 4.3,
-      image: "https://via.placeholder.com/150?text=Speaker",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 5,
       name: "Bluetooth Speaker",
       price: "$150",
       rating: 4.3,
-      image: "https://via.placeholder.com/150?text=Speaker",
+      image: "https://via.placeholder.com/150",
     },
     {
       id: 6,
       name: "Bluetooth Speaker",
       price: "$150",
       rating: 4.3,
-      image: "https://via.placeholder.com/150?text=Speaker",
+      image: "https://via.placeholder.com/150",
     },
   ];
   return (
