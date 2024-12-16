@@ -9,11 +9,19 @@ export const getFirebaseData = () => {
     return new Promise((resolve, reject) => {
         try {
             onValue(starCountRef, (snapshot) => {
-                resolve(snapshot.val());
+                const updateCategory = [];
+                snapshot.forEach((item) => {
+                    updateCategory.push({
+                        id: item.key,
+                        ...item.val()
+                    })
+                })
+                resolve(updateCategory);
             });
         } catch (error) {
-            reject(error);
+            reject(error)
         }
     })
+
 
 }

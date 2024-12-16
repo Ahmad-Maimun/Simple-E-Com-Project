@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getFirebaseData } from "../../database/firebaseUtils";
 
 const initialState = {
@@ -8,36 +8,35 @@ const initialState = {
     error: null
 };
 
-export const getProducts = createAsyncThunk('products/getProducts',
-    async () => {
+export const getProducts = createAsyncThunk(
+    "products/getProducts", async () => {
         let data = await getFirebaseData();
-
-        console.log(data);
-
-
-        return [];
-
+        return data;
     }
-)
+);
 
-const productsSlice = ({
+
+const productSlice = createSlice({
     name: "products",
     initialState,
     reducers: {},
-    extraReducer: (builder) => {
-        builder.addCase('pending', (state, action) => {
+    extraReducers: (builder) => {
+        builder.addCase(getProducts.pending, (state, action) => {
             state.isError = false;
             state.isLoading = true;
         })
-        builder.addCase('fulfilled', (state, action) => {
+        builder.addCase(getProducts.fulfilled, (state, action) => {
             state.isLoading = false;
-            console.log(action);
+            state.products = action.payload;
         })
-        builder.addCase('rejected', (state, action) => {
+        builder.addCase(getProducts.rejected, (state, action) => {
             state.isError = true;
             state.error = action.payload.error?.message;
         })
     }
-});
+})
 
-export default productsSlice
+
+
+
+export default productSlice.reducer
