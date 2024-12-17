@@ -1,4 +1,5 @@
 import { Link, Outlet } from "react-router";
+import { ToastContainer } from "react-toastify";
 
 function DashboardLayout() {
   return (
@@ -34,6 +35,7 @@ function DashboardLayout() {
 
       <div className="py-5">
         <Outlet />
+        <ToastContainer />
       </div>
     </>
   );

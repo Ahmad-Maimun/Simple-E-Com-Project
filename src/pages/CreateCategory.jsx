@@ -1,12 +1,17 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
-import { setDataToFirebase } from "../database/firebaseUtils";
+import { toast } from "react-toastify";
+import {
+  getFirebaseDataForEdit,
+  setDataFromFirebase,
+  setDataToFirebase,
+} from "../database/firebaseUtils";
 import { categoryFormSchema } from "../validation/validationSchema";
 function CreateCategory() {
   const navigate = useNavigate();
   const params = useParams();
-  console.log(params);
 
   const {
     register,
@@ -21,9 +26,31 @@ function CreateCategory() {
     },
   });
   const onSubmit = (data) => {
-    setDataToFirebase("categories", data);
+    if (params.id) {
+      setDataFromFirebase(`categories/${params.id}`, data);
+      toast("Update Is Successful");
+    } else {
+      setDataToFirebase("categories", data);
+      toast("Add Is Successful");
+    }
     navigate(-1);
   };
+
+  useEffect(() => {
+    async function getData() {
+      let res = await getFirebaseDataForEdit("categories/" + params.id);
+      reset(res);
+      console.log(res);
+    }
+    if (params.id) {
+      getData();
+    } else {
+      reset({
+        categoryName: "",
+        categoryImage: "",
+      });
+    }
+  }, [params]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-400 to-blue-500">
