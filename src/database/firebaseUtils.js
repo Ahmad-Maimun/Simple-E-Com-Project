@@ -1,10 +1,10 @@
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, onValue, push, ref } from "firebase/database";
 import app from "./firebaseConfig";
 
 const db = getDatabase(app);
 
-export const getFirebaseData = () => {
-    const starCountRef = ref(db, "Categories");
+export const getFirebaseData = (tableName) => {
+    const starCountRef = ref(db, tableName);
 
     return new Promise((resolve, reject) => {
         try {
@@ -24,4 +24,8 @@ export const getFirebaseData = () => {
     })
 
 
+}
+
+export const setDataToFirebase = (tableName, data) => {
+    push(ref(db, tableName), data);
 }

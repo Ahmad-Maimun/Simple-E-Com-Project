@@ -1,33 +1,35 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { getDatabase, push, ref } from "firebase/database";
 import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import app from "../database/firebaseConfig";
+import { useNavigate, useParams } from "react-router";
+import { setDataToFirebase } from "../database/firebaseUtils";
+import { categoryFormSchema } from "../validation/validationSchema";
 function CreateCategory() {
-  const schema = yup
-    .object({
-      categoryName: yup.string().required(),
-      categoryImage: yup.string().required().url(),
-    })
-    .required();
+  const navigate = useNavigate();
+  const params = useParams();
+  console.log(params);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(categoryFormSchema),
+    defaultValues: {
+      categoryName: "",
+      categoryImage: "",
+    },
   });
   const onSubmit = (data) => {
-    const db = getDatabase(app);
-    push(ref(db, "Categories"), data);
+    setDataToFirebase("categories", data);
+    navigate(-1);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-400 to-blue-500">
       <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-5">
-          Add Category
+          {params.id ? "Edit Category" : "Add Category"}
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Product Name */}
@@ -80,7 +82,7 @@ function CreateCategory() {
               type="submit"
               className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300"
             >
-              Add Category
+              {params.id ? "Edit Category" : "Add Category"}
             </button>
           </div>
         </form>

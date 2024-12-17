@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getProducts } from "../features/products/productSlice";
+import { Link } from "react-router";
+import { getCategories } from "../features/categories/categorySlice";
 
 function HomeDashboard() {
-  const data = useSelector((state) => state.products);
+  const categoriesData = useSelector((state) => state.categories);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getProducts());
+    dispatch(getCategories());
   }, []);
 
   const categories = [
@@ -83,6 +84,66 @@ function HomeDashboard() {
       image: "https://via.placeholder.com/150",
     },
   ];
+
+  let categoriesSectionContent;
+
+  if (categoriesData.isLoading) {
+    categoriesSectionContent = (
+      <div className="text-xl">Data is Loading.....</div>
+    );
+  }
+
+  if (categoriesData.isError) {
+    categoriesSectionContent = (
+      <div className="text-xl">Error || {categoriesData.error}</div>
+    );
+  }
+  if (
+    !categoriesData.isLoading &&
+    !categoriesData.isError &&
+    categoriesData.categories.length === 0
+  ) {
+    categoriesSectionContent = <div className="text-xl">🥸No Data Found🥸</div>;
+  }
+
+  if (
+    !categoriesData.isLoading &&
+    !categoriesData.isError &&
+    categoriesData.categories.length > 0
+  ) {
+    categoriesSectionContent = categoriesData.categories.map((category) => (
+      <div
+        key={category.id}
+        className="w-48 bg-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300"
+      >
+        <img
+          src={category.categoryImage}
+          alt={category.categoryName}
+          className="w-full h-32 object-cover rounded-t-lg"
+        />
+        <div className="p-3 text-center">
+          <h3 className="text-lg font-semibold text-gray-700">
+            {category.categoryName}
+          </h3>
+          <div className="flex justify-between mt-4">
+            {/* Edit Button */}
+            <Link
+              to={`edit-category/${category.id}`}
+              className="bg-green-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300"
+            >
+              Edit
+            </Link>
+
+            {/* Delete Button */}
+            <button className="bg-red-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-600 hover:shadow-lg transition-all duration-300">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    ));
+  }
+
   return (
     <div>
       <section className="bg-gray-50 py-6">
@@ -93,23 +154,7 @@ function HomeDashboard() {
 
           {/* All Categories in One Line */}
           <div className="flex justify-between gap-4">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="w-48 bg-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300"
-              >
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="w-full h-32 object-cover rounded-t-lg"
-                />
-                <div className="p-3 text-center">
-                  <h3 className="text-lg font-semibold text-gray-700">
-                    {category.name}
-                  </h3>
-                </div>
-              </div>
-            ))}
+            {categoriesSectionContent}
           </div>
         </div>
       </section>
