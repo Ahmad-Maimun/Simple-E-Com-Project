@@ -1,45 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
-import { getCategories } from "../features/categories/categorySlice";
+import Modal from "../components/Modal";
+import {
+  deleteCategories,
+  getCategories,
+} from "../features/categories/categorySlice";
 
 function HomeDashboard() {
   const categoriesData = useSelector((state) => state.categories);
+  const [deleteCategoryId, setDeleteCategoryId] = useState(false);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getCategories());
-  }, []);
+  }, [dispatch]);
 
-  const categories = [
-    {
-      id: 1,
-      name: "Technology",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Health",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      name: "Travel",
-      image: "https://via.placeholder.com/150",
-    },
-    { id: 4, name: "Food", image: "https://via.placeholder.com/150" },
-    {
-      id: 5,
-      name: "Education",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 6,
-      name: "Sports",
-      image: "https://via.placeholder.com/150",
-    },
-  ];
   const products = [
     {
       id: 1,
@@ -84,6 +61,22 @@ function HomeDashboard() {
       image: "https://via.placeholder.com/150",
     },
   ];
+
+  const clickHandler = (id) => {
+    setDeleteCategoryId(id);
+  };
+
+  const modalCloseHandler = () => {
+    setDeleteCategoryId(false);
+  };
+
+  const deleteHandler = () => {
+    if (deleteCategoryId) {
+      // deleteDataFromFirebase("categories/" + deleteCategoryId);
+      dispatch(deleteCategories(deleteCategoryId));
+    }
+    setDeleteCategoryId(false);
+  };
 
   let categoriesSectionContent;
 
@@ -135,7 +128,10 @@ function HomeDashboard() {
             </Link>
 
             {/* Delete Button */}
-            <button className="bg-red-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-600 hover:shadow-lg transition-all duration-300">
+            <button
+              onClick={() => clickHandler(category.id)}
+              className="bg-red-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-600 hover:shadow-lg transition-all duration-300"
+            >
               Delete
             </button>
           </div>
@@ -146,6 +142,9 @@ function HomeDashboard() {
 
   return (
     <div>
+      {deleteCategoryId && (
+        <Modal onDelete={deleteHandler} onClose={modalCloseHandler} />
+      )}
       <section className="bg-gray-50 py-6">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getFirebaseData } from "../../database/firebaseUtils";
+import { deleteDataFromFirebase, getFirebaseData } from "../../database/firebaseUtils";
 
 const initialState = {
     categories: [],
@@ -15,6 +15,12 @@ export const getCategories = createAsyncThunk(
     }
 );
 
+export const deleteCategories = createAsyncThunk('categories/deleteCategories', async (id) => {
+    const conn = deleteDataFromFirebase("categories/" + id)
+    console.log(conn);
+
+    return id;
+})
 
 const categorySlice = createSlice({
     name: "categories",
@@ -24,15 +30,23 @@ const categorySlice = createSlice({
         builder.addCase(getCategories.pending, (state, action) => {
             state.isError = false;
             state.isLoading = true;
-        })
-        builder.addCase(getCategories.fulfilled, (state, action) => {
+        }).addCase(getCategories.fulfilled, (state, action) => {
             state.isLoading = false;
             state.categories = action.payload;
+        }).addCase(getCategories.rejected, (state, action) => {
+
         })
-        builder.addCase(getCategories.rejected, (state, action) => {
+
+        builder.addCase(deleteCategories.fulfilled, (state, action) => {
+            const categoryIndex = state.categories.findIndex(
+                (item) => item.id == action.payload
+            )
+            state.categories.splice(categoryIndex, 1);
+
+        }).addCase(deleteCategories.rejected, (state, action) => {
             state.isError = true;
             state.error = action.payload.error?.message;
-        })
+        });
     }
 })
 

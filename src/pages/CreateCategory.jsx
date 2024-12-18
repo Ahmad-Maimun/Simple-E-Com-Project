@@ -40,7 +40,6 @@ function CreateCategory() {
     async function getData() {
       let res = await getFirebaseDataForEdit("categories/" + params.id);
       reset(res);
-      console.log(res);
     }
     if (params.id) {
       getData();
