@@ -17,8 +17,6 @@ export const getCategories = createAsyncThunk(
 
 export const deleteCategories = createAsyncThunk('categories/deleteCategories', async (id) => {
     const conn = deleteDataFromFirebase("categories/" + id)
-    console.log(conn);
-
     return id;
 })
 
