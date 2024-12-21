@@ -56,7 +56,7 @@ export const deleteDataFromFirebase = (tableName) => {
         try {
             resolve(remove(ref(db, tableName)));
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-}
+    });
+};

@@ -7,8 +7,8 @@ import {
   getFirebaseDataForEdit,
   setDataFromFirebase,
   setDataToFirebase,
-} from "../database/firebaseUtils";
-import { categoryFormSchema } from "../validation/validationSchema";
+} from "../../database/firebaseUtils";
+import { categoryFormSchema } from "../../validation/validationSchema";
 function CreateCategory() {
   const navigate = useNavigate();
   const params = useParams();

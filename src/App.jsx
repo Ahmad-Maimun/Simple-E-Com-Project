@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
 import Error from "./Error";
 import DashboardLayout from "./layout/DashboardLayout";
-import CreateCategory from "./pages/CreateCategory";
-import CreateProduct from "./pages/CreateProduct";
-import HomeDashboard from "./pages/HomeDashboard";
+import CreateCategory from "./pages/category/Index";
+import HomeDashboard from "./pages/home/Index";
+import CreateProduct from "./pages/product/Index";
 
 function App() {
   return (
@@ -13,6 +13,7 @@ function App() {
         <Route path="create-category" element={<CreateCategory />} />
         <Route path="edit-category/:id" element={<CreateCategory />} />
         <Route path="create-product" element={<CreateProduct />} />
+        <Route path="edit-product/:id" element={<CreateProduct />} />
         {/* Error Element */}
         <Route path="*" element={<Error />} />
       </Route>
