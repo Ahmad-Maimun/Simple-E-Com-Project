@@ -23,7 +23,6 @@ function CreateProduct() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
     dispatch(setProducts(data));
     reset();
     navigate("/");

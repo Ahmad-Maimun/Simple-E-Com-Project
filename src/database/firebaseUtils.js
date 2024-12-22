@@ -60,3 +60,15 @@ export const deleteDataFromFirebase = (tableName) => {
         }
     });
 };
+
+
+// ************** User Profile **************
+
+export const createUserProfile = async (data) => {
+    const { name, role, id } = data;
+
+    set(ref(db, "userProfile/" + id), {
+        name,
+        role
+    });
+};
