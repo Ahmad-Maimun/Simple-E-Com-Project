@@ -1,6 +1,29 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { loginUser } from "../../database/firebaseAuth";
+import { loginValidation } from "../../validation/validationSchema";
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(loginValidation),
+  });
+
+  const onSubmit = async (data) => {
+    const res = await loginUser(data);
+    if (res.error) {
+      toast.error(res.code);
+    } else {
+      console.log(res);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
@@ -8,7 +31,7 @@ const Login = () => {
           Welcome Back!
         </h2>
 
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-semibold mb-2"
@@ -21,7 +44,11 @@ const Login = () => {
               id="email"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500"
               placeholder="Enter your email"
+              {...register("email")}
             />
+            {errors.email && (
+              <span className="text-red-500">{errors.email?.message}</span>
+            )}
           </div>
 
           <div className="mb-6">
@@ -36,7 +63,11 @@ const Login = () => {
               id="password"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500"
               placeholder="Enter your password"
+              {...register("password")}
             />
+            {errors.password && (
+              <span className="text-red-500">{errors.password?.message}</span>
+            )}
           </div>
 
           <button

@@ -43,3 +43,21 @@ export const registerValidation = yup
             .oneOf([yup.ref('password')], 'Passwords must match.'),
     })
     .required();
+
+export const loginValidation = yup
+    .object({
+        email: yup
+            .string()
+            .required('Email is required.')
+            .email('Please provide a valid email address.'),
+
+        password: yup
+            .string()
+            .required('Password is required.')
+            .min(8, 'Password must be at least 8 characters long.')
+            .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/,
+                'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
+            ),
+    })
+    .required();
