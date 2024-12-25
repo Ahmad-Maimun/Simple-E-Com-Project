@@ -1,15 +1,17 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { loginUser } from "../../database/firebaseAuth";
 import { loginValidation } from "../../validation/validationSchema";
 
 const Login = () => {
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(loginValidation),
@@ -20,6 +22,7 @@ const Login = () => {
     if (res.error) {
       toast.error(res.code);
     } else {
+      // Login User
       console.log(res);
     }
   };
