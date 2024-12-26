@@ -1,6 +1,9 @@
+import { useSelector } from "react-redux";
 import { Link, Outlet } from "react-router";
 
 function DashboardLayout() {
+  const authUser = useSelector((store) => store.auth);
+
   return (
     <>
       <header className="bg-white shadow-md">
@@ -28,9 +31,14 @@ function DashboardLayout() {
             >
               Create Category
             </Link>
+            <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-full font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300">
+              Log Out
+            </button>
           </nav>
         </div>
       </header>
+
+      <h1>{authUser.user.name}</h1>
 
       <div className="py-5">
         <Outlet />
