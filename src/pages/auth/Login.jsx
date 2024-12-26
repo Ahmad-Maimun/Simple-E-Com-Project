@@ -2,16 +2,20 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { loginUser } from "../../database/firebaseAuth";
+import { getProfile } from "../../database/firebaseUtils";
+import { addUser } from "../../features/auth/authSlice";
 import { loginValidation } from "../../validation/validationSchema";
 
 const Login = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(loginValidation),
@@ -23,7 +27,16 @@ const Login = () => {
       toast.error(res.code);
     } else {
       // Login User
-      console.log(res);
+      let userProfile = await getProfile(res.id);
+      const loginUserInfo = {
+        id: res.id,
+        email: res.email,
+        name: userProfile.name,
+        role: userProfile.role,
+      };
+      dispatch(addUser(loginUserInfo));
+      reset();
+      navigate("/dashboard");
     }
   };
 

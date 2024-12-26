@@ -72,3 +72,19 @@ export const createUserProfile = async (data) => {
         role
     });
 };
+
+export const getProfile = async (id) => {
+
+
+    try {
+        return new Promise((resolve, reject) => {
+            onValue(ref(db, "userProfile/" + id), (snapshot) => {
+                resolve(snapshot.val());
+            });
+        })
+    } catch (error) {
+        reject(error);
+    }
+
+
+}

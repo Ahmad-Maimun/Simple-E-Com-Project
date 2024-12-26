@@ -27,7 +27,11 @@ const loginUser = async ({ email, password }) => {
 
     try {
         const response = await signInWithEmailAndPassword(auth, email, password);
-        return response.user; // User
+        const user = response.user;
+        return {
+            id: user.uid,
+            email: user.email
+        }
     } catch (error) {
         return {
             error: true,
