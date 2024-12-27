@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { auth, loginUser } from "../../database/firebaseAuth";
-import { getProfile } from "../../database/firebaseUtils";
+import { createUserProfile, getProfile } from "../../database/firebaseUtils";
 import { addUser } from "../../features/auth/authSlice";
 import { loginValidation } from "../../validation/validationSchema";
 
@@ -48,22 +48,36 @@ const Login = () => {
   const googleLogin = async () => {
     const provider = new GoogleAuthProvider(); // Instantiate the provider
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const res = await signInWithPopup(auth, provider);
+      const user = res.user;
 
       // Optionally fetch or save user profile details
-      const userProfile = {
+      const newUser = {
         id: user.uid,
-        email: user.email,
         name: user.displayName,
+        role: "user",
       };
 
-      dispatch(addUser(userProfile)); // Update Redux state with user details
+      const userProfile = await getProfile(user.uid);
+
+      if (!userProfile) {
+        // If user profile doesn't exist, create a new one
+        addUser(newUser);
+        dispatch(addUser(newUser));
+      } else {
+        // Preserve existing role and set user information to Redux
+        const updatedUser = {
+          ...newUser,
+          role: userProfile.role, // Keep the existing role
+        };
+        dispatch(addUser(updatedUser));
+      }
+
+      createUserProfile(newUser); // Optional: if you want to update the profile
       toast.success("Login successful!");
       navigate("/dashboard");
     } catch (error) {
-      toast.error("Google login failed. Please try again.");
-      console.error("Google Login Error:", error);
+      console.log(error);
     }
   };
 
