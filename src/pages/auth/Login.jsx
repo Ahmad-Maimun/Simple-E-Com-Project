@@ -1,10 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { loginUser } from "../../database/firebaseAuth";
+import { auth, loginUser } from "../../database/firebaseAuth";
 import { getProfile } from "../../database/firebaseUtils";
 import { addUser } from "../../features/auth/authSlice";
 import { loginValidation } from "../../validation/validationSchema";
@@ -12,6 +13,7 @@ import { loginValidation } from "../../validation/validationSchema";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -22,21 +24,46 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    const res = await loginUser(data);
-    if (res.error) {
-      toast.error(res.code);
-    } else {
-      // Login User
-      let userProfile = await getProfile(res.id);
-      const loginUserInfo = {
-        id: res.id,
-        email: res.email,
-        name: userProfile.name,
-        role: userProfile.role,
+    try {
+      const res = await loginUser(data);
+      if (res.error) {
+        toast.error(res.code);
+      } else {
+        let userProfile = await getProfile(res.id);
+        const loginUserInfo = {
+          id: res.id,
+          email: res.email,
+          name: userProfile.name,
+          role: userProfile.role,
+        };
+        dispatch(addUser(loginUserInfo));
+        reset();
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+  const googleLogin = async () => {
+    const provider = new GoogleAuthProvider(); // Instantiate the provider
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Optionally fetch or save user profile details
+      const userProfile = {
+        id: user.uid,
+        email: user.email,
+        name: user.displayName,
       };
-      dispatch(addUser(loginUserInfo));
-      reset();
+
+      dispatch(addUser(userProfile)); // Update Redux state with user details
+      toast.success("Login successful!");
       navigate("/dashboard");
+    } catch (error) {
+      toast.error("Google login failed. Please try again.");
+      console.error("Google Login Error:", error);
     }
   };
 
@@ -100,7 +127,10 @@ const Login = () => {
           <span className="border-b w-1/5 lg:w-1/4"></span>
         </div>
 
-        <button className="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200 flex items-center justify-center">
+        <button
+          onClick={googleLogin}
+          className="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200 flex items-center justify-center"
+        >
           <svg
             className="h-5 w-5 mr-2"
             xmlns="http://www.w3.org/2000/svg"

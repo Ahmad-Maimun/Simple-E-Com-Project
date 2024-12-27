@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { registerUser } from "../../database/firebaseAuth";
 import { createUserProfile } from "../../database/firebaseUtils";
@@ -132,9 +132,12 @@ const Register = () => {
 
         <p className="text-center text-gray-600 text-sm mt-4">
           Already have an account?{" "}
-          <a href="#" className="text-blue-500 hover:underline font-medium">
+          <Link
+            to="/login"
+            className="text-blue-500 hover:underline font-medium"
+          >
             Login here
-          </a>
+          </Link>
         </p>
       </div>
     </div>
