@@ -1,49 +1,214 @@
-import { useSelector } from "react-redux";
-import { Link, Outlet } from "react-router";
+import { onValue, ref } from "firebase/database";
+import { useEffect, useState } from "react";
+import Avatar from "react-avatar";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, Outlet, useNavigate } from "react-router";
+import Logo from "../assets/logo.png";
+import { logOutUser } from "../database/firebaseAuth";
+import { db } from "../database/firebaseUtils";
+import { getCategories } from "../features/categories/categorySlice";
+import { getProducts } from "../features/products/productSlice";
 
 function DashboardLayout() {
-  const authUser = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [isShow, setIsShow] = useState(window.innerWidth > 980);
+  const authStore = useSelector((store) => store.auth);
+
+  useEffect(() => {
+    async function getData() {
+      getCategories();
+      getProducts();
+    }
+    getData();
+  }, []);
+
+  useEffect(() => {
+    const categoryRef = ref(db, "categories");
+    const productRef = ref(db, "products");
+
+    // Set category to redux for getting this content globally;
+    const disableCategory = onValue(categoryRef, (snapshot) => {
+      const updateCategoryList = [];
+      snapshot.forEach((item) => {
+        updateCategoryList.push({
+          id: item.key,
+          ...item.val(),
+        });
+      });
+      dispatch(getCategories(updateCategoryList));
+    });
+
+    // Set products to redux for getting this content globally;
+    const disableProduct = onValue(productRef, (snapshot) => {
+      const updateProductList = [];
+      snapshot.forEach((item) => {
+        updateProductList.push({
+          id: item.key,
+          ...item.val(),
+        });
+      });
+      dispatch(getProducts(updateProductList));
+    });
+
+    return () => {
+      disableCategory();
+      disableProduct();
+    };
+  }, [dispatch]);
+
+  const Greetings = () => {
+    let myDate = new Date();
+    let hours = myDate.getHours();
+    let greet;
+
+    if (hours < 12) greet = "morning";
+    else if (hours >= 12 && hours <= 17) greet = "afternoon";
+    else greet = "evening";
+
+    return <span>Good {greet},</span>;
+  };
+
+  const handleLogout = () => {
+    logOutUser();
+    navigate("/login");
+  };
+
+  const sidebarClass = `bg-[#2E3A59] text-white h-full flex flex-col transition-all duration-300 ${
+    isShow ? "w-64" : "w-0"
+  }`;
 
   return (
-    <>
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          {/* Logo */}
-          <h1 className="text-2xl font-extrabold text-gray-800">Dashboard</h1>
-
-          {/* Navigation Links */}
-          <nav className="flex gap-4">
-            <Link
-              to="/"
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 text-white py-2 px-6 rounded-full font-medium shadow-lg transform hover:scale-105 transition duration-300"
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <aside className={sidebarClass}>
+        {/* Sidebar Header */}
+        <div className="p-6 text-2xl font-semibold border-b border-gray-700 flex items-center justify-between">
+          <img src={Logo} alt="" />
+          {window.innerWidth < 970 && (
+            <svg
+              className="w-6 h-6 text-white border dark:text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+              onClick={() => setIsShow(!isShow)}
             >
-              Home
-            </Link>
-            <Link
-              to="create-product"
-              className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white py-2 px-6 rounded-full font-medium shadow-lg transform hover:scale-105 transition duration-300"
-            >
-              Create Product
-            </Link>
-            <Link
-              to="create-category"
-              className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-red-500 hover:to-pink-500 text-white py-2 px-6 rounded-full font-medium shadow-lg transform hover:scale-105 transition duration-300"
-            >
-              Create Category
-            </Link>
-            <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-full font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300">
-              Log Out
-            </button>
-          </nav>
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 12h14M5 12l4-4m-4 4 4 4"
+              />
+            </svg>
+          )}
         </div>
-      </header>
 
-      <h1>{authUser.user.name}</h1>
+        {/* Menu */}
+        <nav className="flex-1 mt-4">
+          <ul>
+            <li className="p-3 hover:bg-[#475569] cursor-pointer">
+              <NavLink className="block" to={"/dashboard"}>
+                Dashboards
+              </NavLink>
+            </li>
+            <li className="p-3 hover:bg-[#475569] cursor-pointer">
+              <NavLink className="block" to={"/dashboard/index-category"}>
+                Category
+              </NavLink>
+            </li>
+            <li className="p-3 hover:bg-[#475569] cursor-pointer">
+              <NavLink className="block" to={"/dashboard/index-product"}>
+                Products
+              </NavLink>
+            </li>
+            <li className="p-3 hover:bg-[#475569] cursor-pointer">
+              <NavLink className="block" to={"/"}>
+                Users
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-      <div className="py-5">
-        <Outlet />
+      {/* Main Content */}
+      <div className="flex w-full flex-1 flex-col">
+        <header className="flex items-center justify-between bg-white px-6 py-4 shadow-md">
+          <button
+            onClick={() => setIsShow(!isShow)}
+            className="border h-10 w-10 mr-3 flex justify-center items-center cursor-pointer"
+          >
+            <svg
+              className="w-6 h-6 text-gray-800 dark:text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 6h8m-8 4h12M6 14h8m-8 4h12"
+              />
+            </svg>
+          </button>
+
+          <div className="mr-auto">
+            <h1 className="text-lg font-semibold">
+              {Greetings()} {authStore?.user?.name}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <ul className="flex">
+                <li>
+                  <Avatar size="40" name={authStore?.user?.name} />
+                </li>
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="w-10 h-10 ml-2 bg-red-600 flex justify-center items-center"
+                  >
+                    <svg
+                      className="w-6 h-6 text-white dark:text-white"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 bg-gray-100 p-6">
+          <div className="px-4 py-6 bg-white rounded h-full">
+            <Outlet />
+          </div>
+        </main>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -41,7 +41,13 @@ const loginUser = async ({ email, password }) => {
     }
 };
 
-const logoutUser = async () => { };
+const logOutUser = async () => {
+    signOut(auth)
+        .then(() => { })
+        .catch((error) => {
+            // An error happened.
+        });
+};
 
-export { auth, loginUser, logoutUser, registerUser };
+export { auth, loginUser, logOutUser, registerUser };
 
