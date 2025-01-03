@@ -1,7 +1,11 @@
 import React from "react";
 
 function IndexCategory() {
-  return <div>Index</div>;
+  return (
+    <div>
+      <div>Maimun</div>
+    </div>
+  );
 }
 
 export default IndexCategory;
